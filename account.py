@@ -9,7 +9,7 @@ class Account:
     token = '' #token
     account_huodong_msg  = [] #活动信息
     account_xinxi = '' #账号信息
-    server_tongzhi = '' #报名了活动的通知推送 server酱
+    server_tongzhi = '' #报名了活动的通知推送 server酱 key
 
     def __init__(self, data):
         self.name = data['data']['name']
@@ -53,13 +53,18 @@ class Account:
 
     def add_account_huodong_msg(self, account_huodong_msg):
         for i in account_huodong_msg: #遍历一遍活动信息
-            if i[0] in self.account_huodong_msg: #如果没有信息 那么就追加进去
-                continue
-            else:
+            bo = False
+            for k in self.account_huodong_msg:
+                if i[0] == k[0]:
+                    bo = True
+            if bo == False: #如果没有信息 那么就追加进去
                 self.account_huodong_msg.append(i)
 
     def set_account_xinxi(self, account_xinxi):
         self.account_xinxi = account_xinxi
+
+    def get_user(self):
+        return self.user
 
     def get_config_user_name(self):
         return self.config_user_name

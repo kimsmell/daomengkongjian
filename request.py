@@ -150,9 +150,10 @@ class request:
 	
 	#推送通知
 	def server_jiang(title, desp, key):
-		url = 'https://sctapi.ftqq.com/{}.send?'.format(key)
-		data = {
-			'text': title,
-			'desp': desp
-		}
-		requests.post(url, data)
+		if key != '':
+			url = 'https://sctapi.ftqq.com/{}.send?'.format(key)
+			data = {
+				'text': title,
+				'desp': desp
+			}
+			requests.post(url, data)

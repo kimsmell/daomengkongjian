@@ -1,21 +1,20 @@
 import os
 import json
 import request
-config_file = 'config.ini'
+config_file = 'config.json'
 class iostream:
 	
 
 
 	# 解析account.ini文件
 	def get_account():
-
+		s = ''
 		if os.path.exists(config_file):
 			with open(config_file, mode='r', encoding='utf-8') as f:
 				datas = f.readlines()
-				s = ''
 				for i in datas:
 					s += i.replace('\n', '').replace(' ', '')
-				data_s = eval(s)
+		data_s = eval(s)
 		return data_s
 
 	#更新account.ini
@@ -45,7 +44,7 @@ class iostream:
 			activityName = data['data']['activityName'] #活动名称
 			address = data['data']['address'] #活动地址
 			unableJoinReason = data['data']['countdownText'] #结束倒计时  如果报名人数已满 那么会显示报名人数已满否则显示倒计时
-			isbaoming = 'false' #是否报名过
+			isbaoming = '' #是否报名过
 			list.append([activityId, activityName, address, unableJoinReason, isbaoming])
 		return list
 	
