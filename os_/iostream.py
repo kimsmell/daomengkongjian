@@ -1,8 +1,8 @@
 # coding=utf-8
 import os
 import json
-import request
-config_file = 'config.json'
+import http_.request
+config_file = './config.json'
 class iostream:
 	
 
@@ -40,7 +40,7 @@ class iostream:
 		list = []
 		for i in huodong: #活动id 活动名称 活动状态
 			activityId = i['activityId'] #活动id
-			data = request.request.get_huodong_xiangxi(passwd['data'], activityId) #获取活动详细信息
+			data = http_.request.request.get_huodong_xiangxi(passwd['data'], activityId) #获取活动详细信息
 			if data['data']['statusText'] == '报名中':
 				activityName = data['data']['activityName'] #活动名称
 				address = data['data']['address'] #活动地址

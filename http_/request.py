@@ -1,7 +1,7 @@
 # coding=utf-8
 import requests
 import json
-import login
+import util_.login
 
 d_version = '4.5.6'
 	
@@ -133,7 +133,7 @@ class request:
 		:param pwd:
 		:return:
 		"""
-		a_password = login.Login.get_pwd(password)
+		a_password = util_.login.Login.get_pwd(password)
 		url = 'https://appdmkj.5idream.net/v2/login/phone'
 		data = {
 			'pwd': a_password,
