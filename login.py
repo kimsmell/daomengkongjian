@@ -1,3 +1,4 @@
+# coding=utf-8
 import request
 from pyDes import des, ECB, PAD_PKCS5
 import binascii

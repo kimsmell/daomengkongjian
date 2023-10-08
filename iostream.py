@@ -1,3 +1,4 @@
+# coding=utf-8
 import os
 import json
 import request
@@ -40,11 +41,11 @@ class iostream:
 		for i in huodong: #活动id 活动名称 活动状态
 			activityId = i['activityId'] #活动id
 			data = request.request.get_huodong_xiangxi(passwd['data'], activityId) #获取活动详细信息
-		
-			activityName = data['data']['activityName'] #活动名称
-			address = data['data']['address'] #活动地址
-			unableJoinReason = data['data']['countdownText'] #结束倒计时  如果报名人数已满 那么会显示报名人数已满否则显示倒计时
-			isbaoming = '' #是否报名过
-			list.append([activityId, activityName, address, unableJoinReason, isbaoming])
+			if data['data']['statusText'] == '报名中':
+				activityName = data['data']['activityName'] #活动名称
+				address = data['data']['address'] #活动地址
+				unableJoinReason = data['data']['countdownText'] #结束倒计时  如果报名人数已满 那么会显示报名人数已满否则显示倒计时
+				isbaoming = 0 #是否报名过
+				list.append([activityId, activityName, address, unableJoinReason, isbaoming])
 		return list
 	
