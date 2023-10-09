@@ -2,9 +2,14 @@
 import requests
 import json
 import util_.login
+import os_.out_log
 
 d_version = '4.5.6'
-	
+
+out_log = os_.out_log.out_log()
+log_file = out_log.get_log_file()
+err_file = out_log.get_err_file()
+
 headers = {
 'standardUA': '{"uuid":"d0824ff00c104312acb3e91f0f6c1b89","system":"iOS","version":"4.5.8","sysVersion":"15.6","screenResolution":"1242.000000-2688.000000","JPushId":"d0824ff00c104312acb3e91f0f6c1b89","countryCode":"CN","channelName":"dmkj_iOS","createTime":"0","operator":"%E4%B8%AD%E5%9B%BD%E7%A7%BB%E5%8A%A8460660","modifyTime":"0","device":"iPhone 13 Pro Max","hardware":"D64AP,iPhone14,3,arm64,255877271552,1604567040","startTime":"1695387433"}',
 'Content-Type':'application/x-www-form-urlencoded',
@@ -21,14 +26,8 @@ headers = {
 
 class request:
 
+	#获取可报名的活动
 	def get_activit(accounts_data):
-		"""
-		获取可以报名的活动
-		uid     每个账号不同的uid
-		token   账号的token
-		:param accounts_data
-		:return:
-		"""
 		activitys = []
 		url = 'https://appdmkj.5idream.net/v2/activity/activities'
 		token = accounts_data['token']
@@ -52,8 +51,23 @@ class request:
 			'catalogId2': '',
 			'level': '',
 		}
-		response = requests.post(url=url, headers=headers, data=data).json()
-		lists_data = response['data']['list']
+
+		response = None
+		lists_data = None
+
+		try:
+			response = requests.post(url=url, headers=headers, data=data).json()
+		except :
+			out_log.out_txt(err_file, "获取活动的请求失败！")
+		
+		try:
+			lists_data = response['data']['list']
+		except :
+			out_log.out_txt(err_file, "获取活动列表的key异常：{}".format(response))
+		
+		if lists_data == None:
+			return None
+
 		for data_ in lists_data:
 			activityId = data_['activityId']
 			name = data_['name']
@@ -62,14 +76,8 @@ class request:
 			activitys.append(activity)
 		return activitys
 
-
+	#进行报名
 	def post_baoming(passwd, id):
-		"""
-		提交报名函数
-		:param passwd:
-		:param id:
-		:return:
-		"""
 		info = [{"conent": "", "content": "", "fullid": "79857", "key": 1, "notList": "false", "notNull": "false",
 					"system": 0,
 					"title": "姓名"}]
@@ -80,73 +88,55 @@ class request:
 			'remark': '',
 			'data': str(info),  # 活动报名参数
 			'activityId': id,  # 活动ID
-			'version': d_version,
+			'version': d_version,	#版本号
 		}
-		response1 = requests.post(url='https://appdmkj.5idream.net/v2/signup/submit', data=data1,
-									headers=headers).json()
+
+		response1 = None
+		try:
+			response1 = requests.post(url='https://appdmkj.5idream.net/v2/signup/submit', data=data1,
+										headers=headers).json()
+		except :
+			out_log.out_txt(err_file, "报名的请求失败！")
+		
 		return response1
 
-	def get_huodong(passwd, id):
-		info = [{"conent": "", "content": "", "fullid": "79857", "key": 1, "notList": "false", "notNull": "false",
-					"system": 0,
-					"title": "姓名"}]
-
-		data1 = {
-			'uid': passwd['uid'],  # 登陆接口获取
-			'token': str(passwd['token']),  # 登陆接口获取
-			'remark': '',
-			'data': str(info),  # 活动报名参数
-			'activityId': id,  # 活动ID
-			'version': d_version,
-		}
-		response1 = requests.post(url='https://appdmkj.5idream.net/v2/signup/submit', data=data1,
-									headers=headers).json()
-		return response1
-		# 获取活动时间
-
+	#获取活动时间
 	def get_huodong_xiangxi(accounts_data, id):
-		"""
-		获取活动开始时间
-		:param accounts_data:
-		:param id:
-		:return:
-		"""
+
 		url = 'https://appdmkj.5idream.net/v2/activity/detail'
-		token = accounts_data['token']
-		uid = accounts_data['uid']
+		token = accounts_data['token']	#获取token
+		uid = accounts_data['uid']	#获取uid
 		data_get_time = {
 			'uid': uid,  # 登陆接口获取
 			'token': token,  # 登陆接口获取
 			'activityId': int(id),  # 活动ID
-			'version': d_version,
+			'version': d_version,	#版本号
 		}
+		huodong = None
+		try:
+			huodong = requests.post(url=url, headers=headers, data=data_get_time).json()
+		except :
+			out_log.out_txt(err_file, "获取活动时间的请求失败！")
 
-		huodong = requests.post(url=url, headers=headers, data=data_get_time).json()
 		return huodong
 
+	#登录账号
 	def apply(user, password):
-		"""
-		账号登陆,返回uid和token
-		account  登陆账号
-		pwd      加密后的密码
-		:param account:
-		:param pwd:
-		:return:
-		"""
-		a_password = util_.login.Login.get_pwd(password)
+
+		a_password = util_.login.Login.get_pwd(password)	#获取加密后的密码
 		url = 'https://appdmkj.5idream.net/v2/login/phone'
 		data = {
-			'pwd': a_password,
-			'account': user,
-			'version': d_version
+			'pwd': a_password,	#加密后的密码
+			'account': user,	#登录账号
+			'version': d_version	#版本号
 		}
 
-		response = requests.post(url=url, headers=headers, data=data).json()
-		response.update(account=user, pwd=password)
-		# response1 = json.dumps(response)
-		# with open('token', mode='w', encoding='utf-8') as f:
-		# 	f.write(response1)
-
+		response = None
+		try:
+			response = requests.post(url=url, headers=headers, data=data).json()	#发送登录的请求
+			response.update(account=user, pwd=password)	#更新账号以及密码
+		except :
+			out_log.out_txt(err_file, "登录账号的请求失败！")
 		return response
 	
 	#推送通知
