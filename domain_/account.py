@@ -19,6 +19,7 @@ class Account:
         self.password = data['pwd']
         self.account_xinxi = data['data']
 
+
     def set_user(self, user):
         self.user = user
     
@@ -59,7 +60,6 @@ class Account:
                     bo = True
             if bo == False: #如果没有信息 那么就追加进去
                 self.account_huodong_msg.append(i)
-
     def set_account_xinxi(self, account_xinxi):
         self.account_xinxi = account_xinxi
 

@@ -81,7 +81,6 @@ class request:
 		info = [{"conent": "", "content": "", "fullid": "79857", "key": 1, "notList": "false", "notNull": "false",
 					"system": 0,
 					"title": "姓名"}]
-
 		data1 = {
 			'uid': passwd['uid'],  # 登陆接口获取
 			'token': str(passwd['token']),  # 登陆接口获取
@@ -130,7 +129,7 @@ class request:
 			'account': user,	#登录账号
 			'version': d_version	#版本号
 		}
-
+		print(a_password)
 		response = None
 		try:
 			response = requests.post(url=url, headers=headers, data=data).json()	#发送登录的请求

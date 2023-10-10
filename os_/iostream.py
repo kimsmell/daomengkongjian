@@ -56,16 +56,28 @@ class iostream:
 			data = http_.request.request.get_huodong_xiangxi(passwd['data'], activityId) #获取活动详细信息
 			if data == None:
 				return list
-			
+			# print(data['data']['joindate'])
+			out_log.out_txt(log_file, "活动详细信息：{}".format(data))
+			data_t = None
 			try:
-				if data['data']['statusText'] == '报名中':
-					activityName = data['data']['activityName'] #活动名称
-					address = data['data']['address'] #活动地址
-					unableJoinReason = data['data']['countdownText'] #结束倒计时  如果报名人数已满 那么会显示报名人数已满否则显示倒计时
-					isbaoming = 0 #是否报名过
-					list.append([activityId, activityName, address, unableJoinReason, isbaoming])
+				if data['data']['statusText'] == '规划中' or data['data']['statusText'] == '报名中':
+					data_t = data['data']
+
 			except :
-				out_log.out_txt(err_file, "{}: 活动信息错误：{}".format(datetime.datetime.now(), data))
-		
+				out_log.out_txt(err_file, "{}: 获取活动状态信息错误：{}".format(datetime.datetime.now(), data))
+
+			if data_t == None:
+				return list
+			list_t = []
+			activityName = data_t['activityName']  # 活动名称
+			address = data_t['address']  # 活动地址
+			unableJoinReason = data_t['countdownText']  # 结束倒计时  如果报名人数已满 那么会显示报名人数已满否则显示倒计时
+			isbaoming = 0  # 是否报名过
+
+			if data_t['statusText'] == '报名中':
+				list_t = [activityId, activityName, address, unableJoinReason, isbaoming, 0, 'null']
+			if data_t['statusText'] == '规划中':
+				list_t[5] = 1
+				list_t[6] = data_t['joindate']
+			list.append(list_t)
 		return list
-	
