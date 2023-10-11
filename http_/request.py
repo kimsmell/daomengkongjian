@@ -1,30 +1,18 @@
 # coding=utf-8
+from util_.login import Login
+from os_.out_log import out_log
+from config import config
+
 import requests
 import json
-import util_.login
-import os_.out_log
 
-d_version = '4.5.6'
 
-out_log = os_.out_log.out_log()
-log_file = out_log.get_log_file()
-err_file = out_log.get_err_file()
+d_version = config.d_version
+log_file = 1
+err_file = 2
+headers = config.headers
 
-headers = {
-'standardUA': '{"uuid":"d0824ff00c104312acb3e91f0f6c1b89","system":"iOS","version":"4.5.8","sysVersion":"15.6","screenResolution":"1242.000000-2688.000000","JPushId":"d0824ff00c104312acb3e91f0f6c1b89","countryCode":"CN","channelName":"dmkj_iOS","createTime":"0","operator":"%E4%B8%AD%E5%9B%BD%E7%A7%BB%E5%8A%A8460660","modifyTime":"0","device":"iPhone 13 Pro Max","hardware":"D64AP,iPhone14,3,arm64,255877271552,1604567040","startTime":"1695387433"}',
-'Content-Type':'application/x-www-form-urlencoded',
-'Accept': '*/*',
-'Cookie':'acw_tc=2f624a5016958158420312945e34eae2f925c163d6ad7b4cb28af85273fbeb',
-'Content-Length': '526',
-'Accept-Language': 'zh-Hans-CN;q=1, fr-CA;q=0.9, en-CN;q=0.8',
-'Host': 'appdmkj.5idream.net',
-'Connection': 'keep-Alive',
-'Accept-Encoding': 'gzip, deflate, br',
-'User-Agent': 'DMKJ/4.5.8 (iPhone; iOS 15.6; Scale/3.00)',
-
-}
-
-class request:
+class Request:
 
 	#获取可报名的活动
 	def get_activit(accounts_data):
@@ -57,13 +45,13 @@ class request:
 
 		try:
 			response = requests.post(url=url, headers=headers, data=data).json()
-		except :
-			out_log.out_txt(err_file, "获取活动的请求失败！")
+		except Exception as e:
+			out_log().out_txt(err_file, '获取活动的请求失败！\n{}'.format(e))
 		
 		try:
 			lists_data = response['data']['list']
-		except :
-			out_log.out_txt(err_file, "获取活动列表的key异常：{}".format(response))
+		except Exception as e:
+			out_log().out_txt(err_file, "获取活动列表的key异常：{}\n{}".format(response, e))
 		
 		if lists_data == None:
 			return None
@@ -94,8 +82,8 @@ class request:
 		try:
 			response1 = requests.post(url='https://appdmkj.5idream.net/v2/signup/submit', data=data1,
 										headers=headers).json()
-		except :
-			out_log.out_txt(err_file, "报名的请求失败！")
+		except Exception as e:
+			out_log().out_txt(err_file, "报名的请求失败！\n{}".format(e))
 		
 		return response1
 
@@ -114,28 +102,28 @@ class request:
 		huodong = None
 		try:
 			huodong = requests.post(url=url, headers=headers, data=data_get_time).json()
-		except :
-			out_log.out_txt(err_file, "获取活动时间的请求失败！")
+		except Exception as e:
+			out_log().out_txt(err_file, "获取活动时间的请求失败！\n{}".format(e))
 
 		return huodong
 
 	#登录账号
 	def apply(user, password):
 
-		a_password = util_.login.Login.get_pwd(password)	#获取加密后的密码
+		a_password = Login.get_pwd(password)	#获取加密后的密码
 		url = 'https://appdmkj.5idream.net/v2/login/phone'
 		data = {
 			'pwd': a_password,	#加密后的密码
 			'account': user,	#登录账号
 			'version': d_version	#版本号
 		}
-		print(a_password)
+
 		response = None
 		try:
 			response = requests.post(url=url, headers=headers, data=data).json()	#发送登录的请求
 			response.update(account=user, pwd=password)	#更新账号以及密码
-		except :
-			out_log.out_txt(err_file, "登录账号的请求失败！")
+		except Exception as e:
+			out_log().out_txt(err_file, "登录账号的请求失败！\n{}".format(e))
 		return response
 	
 	#推送通知

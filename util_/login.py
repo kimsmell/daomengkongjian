@@ -1,12 +1,13 @@
 # coding=utf-8
-import http_.request
 from pyDes import des, ECB, PAD_PKCS5
 import binascii
 
 class Login:
-    
+
     def login(user, password):
-        return http_.request.request.apply(user=user, password=password)
+        from http_.request import Request
+
+        return Request.apply(user=user, password=password)
     
     #密码加密
     def get_pwd(s):

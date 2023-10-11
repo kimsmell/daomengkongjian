@@ -1,4 +1,4 @@
-import os_.iostream
+from os_.iostream import iostream
 
 class Account:
     config_user_name = '' #配置文件中的name
@@ -40,7 +40,7 @@ class Account:
 
     #更新account.ini的状态 主要是更新 token account_huodong_msg
     def update_file_account_huodong_msg(self, name):
-        os_.iostream.iostream.updata_ini(user = self.user, password  = self.password, token = self.token, account_huodong_msg = self.account_huodong_msg, name = name)
+        iostream.updata_ini(user = self.user, password  = self.password, token = self.token, account_huodong_msg = self.account_huodong_msg, name = name)
         
 
     #更新是否报名的状态
@@ -55,11 +55,16 @@ class Account:
     def add_account_huodong_msg(self, account_huodong_msg):
         for i in account_huodong_msg: #遍历一遍活动信息
             bo = False
+
             for k in self.account_huodong_msg:
                 if i[0] == k[0]:
+                    k[3] = i[3]
+                    self.update_account_huodong_msg(i[0], k)
                     bo = True
+
             if bo == False: #如果没有信息 那么就追加进去
                 self.account_huodong_msg.append(i)
+
     def set_account_xinxi(self, account_xinxi):
         self.account_xinxi = account_xinxi
 
