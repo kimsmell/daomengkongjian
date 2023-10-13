@@ -1,7 +1,7 @@
 # coding=utf-8
 from config import config
-from http_.request import Request
-from os_.out_log import out_log
+from utils.request import Request
+from utils.out_log import out_log
 
 import os
 import json
@@ -55,6 +55,7 @@ class iostream:
         for i in huodong:  # 活动id 活动名称 活动状态
             activityId = i['activityId']  # 活动id
             data = Request.get_huodong_xiangxi(passwd['data'], activityId)  # 获取活动详细信息
+            # print(data)
             if data == None:
                 return list
             # print(data['data']['joindate'])
@@ -72,13 +73,13 @@ class iostream:
             list_t = []
             activityName = data_t['activityName']  # 活动名称
             address = data_t['address']  # 活动地址
-            unableJoinReason = data_t['countdownText']  # 结束倒计时  如果报名人数已满 那么会显示报名人数已满否则显示倒计时
+            unableJoinReason = data_t['countdownText']  # 活动状态 活动开始倒计时 活动结束倒计时 活动结束等
             isbaoming = 0  # 是否报名过
 
             if data_t['statusText'] == '报名中':
                 list_t = [activityId, activityName, address, unableJoinReason, isbaoming, 0, 'null']
 
             if data_t['statusText'] == '规划中':
-                list_t = [activityId, activityName, address, unableJoinReason, isbaoming, 1, data_t['joindate']]
+                list_t = [activityId, activityName, address, unableJoinReason, isbaoming, 1, data_t['joindate'].replace(' ', '')]
             list.append(list_t)
         return list

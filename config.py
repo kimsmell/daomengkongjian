@@ -1,7 +1,7 @@
 
 class config:
     #配置文件路径
-    config_file = './config.json'
+    config_file = 'data/config.json'
 
     #log文件路径
     log_file = "./log/log.log"

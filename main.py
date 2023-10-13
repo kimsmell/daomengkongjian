@@ -1,9 +1,9 @@
 from apscheduler.schedulers.background import BackgroundScheduler
-from os_.out_log import out_log
-from domain_.account import Account
-from os_.iostream import iostream
-from util_.login import Login
-from http_.request import Request
+from utils.out_log import out_log
+from models.account import Account
+from utils.iostream import iostream
+from utils.login import Login
+from utils.request import Request
 from config import config
 
 import json
@@ -26,7 +26,7 @@ def baoming(a_account, name):
     for i in account_huodong_msg:  # 遍历一遍活动信息
 
         if i[3] == '报名结束倒计时' and i[4] == 0:  # 判断是否可报名
-            out_log().out_txt(log_file, "开始报名")  # 打印日志
+            out_log().out_txt(log_file, f"{i[1]}开始报名")  # 打印日志
             id = i[0]  # 获取活动id
             requests1 = Request.post_baoming(account_xinxi, id)  # 进行报名 发送报名的请求
             if requests1 == None:
@@ -97,25 +97,13 @@ def main(data, name):
     if huodong != []:
         a.add_account_huodong_msg(data['account_huodong_msg'])  # 添加报名过的活动信息给账号
         a.add_account_huodong_msg(huodong)  # 将活动添加进去
-
+        a.update_huodong()
+        if i in a.get_account_huodong_msg():
+            print(i)
         baoming(a, name)  # 开始报名
         account_list.append(a)  # 将账号添加到list中去
 
-        for i in a.get_account_huodong_msg():  # 添加定时任务 到时间就进行预报名
-            if i[5] == 1 and i[3] == '报名开始倒计时':
-                out_log().out_txt(log_file, "报名时间：{}".format(i[6]))
-                try:
-                    n = int(i[6][:4])
-                    y = int(i[6][5:7])
-                    r = int(i[6][8:10])
-                    h = int(i[6][10:12])
-                    m = int(i[6][13:15])
-                    args = [data['user'], data['password'], a, i]
-                    if not is_job(args):
-                        scheduler.add_job(job, 'date', run_date=datetime.datetime(n, y, r, h, m + 1, 0), args=args)
-                        out_log().out_txt(log_file, "预报名信息：活动名称：{} 报名时间：{}".format(i[2],datetime.datetime(n, y, r, h, m + 1, 0)))  # 打印进行预报名的日志
-                except Exception as e:
-                    out_log().out_txt(err_file, "添加定时任务失败！\n{}".format(e))
+    job_add(a)
 
 
 def do_main(a):
@@ -135,6 +123,8 @@ def do_main(a):
 
     if huodong != []:
         a.add_account_huodong_msg(huodong)  # 将活动添加进去
+        a.update_huodong()
+
         # 开始报名
         baoming(a, a.get_config_user_name())
 
@@ -142,21 +132,27 @@ def do_main(a):
         account_list.remove(tmp)
         account_list.append(a)
 
-        for i in a.get_account_huodong_msg():  # 添加定时任务 到时间就进行预报名
-            if i[5] == 1 and i[3] == '报名开始倒计时':
-                out_log().out_txt(log_file, "报名时间：{}".format(i[6]))
-                try:
-                    n = int(i[6][:4])
-                    y = int(i[6][5:7])
-                    r = int(i[6][8:10])
-                    h = int(i[6][10:12])
-                    m = int(i[6][13:15])
-                    args = [data['user'], data['password'], a, i]
-                    if not is_job(args):
-                        scheduler.add_job(job, 'date', run_date=datetime.datetime(n, y, r, h, m + 1, 0), args=args)
-                        out_log().out_txt(log_file, "预报名信息：活动名称：{} 报名时间：{}".format(i[2],datetime.datetime(n, y, r, h, m + 1, 0)))  # 打印进行预报名的日志
-                except Exception as e:
-                    out_log().out_txt(err_file, "添加定时任务失败！\n{}".format(e))
+        job_add(a)# 添加定时任务 到时间就进行预报名
+
+#添加任务
+def job_add(a):
+    for i in a.get_account_huodong_msg():  # 添加定时任务 到时间就进行预报名
+        if i[5] == 1 and i[3] == '报名开始倒计时':
+            out_log().out_txt(log_file, "报名时间：{}".format(i[6]))
+            try:
+                n = int(i[6][:4])
+                y = int(i[6][5:7])
+                r = int(i[6][8:10])
+                h = int(i[6][10:12])
+                m = int(i[6][13:15])
+                args = [data['user'], data['password'], a, i]
+                if not is_job(args):
+                    scheduler.add_job(job, 'date', run_date=datetime.datetime(n, y, r, h, m + 1, 0), args=args)
+                    out_log().out_txt(log_file, "预报名信息：活动名称：{} 报名时间：{}".format(i[2],
+                                                                               datetime.datetime(n, y, r, h, m + 1,
+                                                                                                 0)))  # 打印进行预报名的日志
+            except Exception as e:
+                out_log().out_txt(err_file, "添加定时任务失败！\n{}".format(e))
 
 # 查找是否有这个任务
 def is_job(args):

@@ -27,7 +27,7 @@ liunx服务器可进行全自动账号托管报名
 
 
 
-#### 多用户报名配置文件：config.json
+#### 多用户报名配置文件：data/config.json
 
 ```json
 {
