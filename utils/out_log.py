@@ -21,9 +21,13 @@ class out_log:
         file = "{}_{}.log".format(file[0:9], i)
         if os.path.exists(file):
             size = os.path.getsize(file)
-            while size > max_size:
+            while size >= max_size:
                 i += 1
-                file = "{}_{}.log".format(file[0:5], i)
+                file = "{}_{}.log".format(file[0:9], i)
+                if not os.path.exists(file):
+                    with open(file, 'w') as f:
+                	    f.write('')
+                		
                 size = os.path.getsize(file)
 
         else:

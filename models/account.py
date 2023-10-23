@@ -2,6 +2,7 @@ from utils.iostream import iostream
 from utils.request import Request
 from utils.out_log import out_log
 from config import config
+import datetime
 
 class Account:
     config_user_name = '' #配置文件中的name
@@ -75,7 +76,7 @@ class Account:
         for j in self.account_huodong_msg:
             if j[3] == '活动已结束，请去瞧瞧其他活动':
                 self.account_huodong_msg.remove(j)
-                out_log().out_txt(config.log_file, f"已移除：{j}")
+                out_log().out_txt(1, f"已移除：{j}")
 
     def add_account_huodong_msg(self, account_huodong_msg):
         for i in account_huodong_msg: #遍历一遍活动信息

@@ -134,25 +134,37 @@ def do_main(a):
 
         job_add(a)# 添加定时任务 到时间就进行预报名
 
-#添加任务
+# 添加任务
 def job_add(a):
+        
     for i in a.get_account_huodong_msg():  # 添加定时任务 到时间就进行预报名
         if i[5] == 1 and i[3] == '报名开始倒计时':
             out_log().out_txt(log_file, "报名时间：{}".format(i[6]))
             try:
+
                 n = int(i[6][:4])
                 y = int(i[6][5:7])
                 r = int(i[6][8:10])
                 h = int(i[6][10:12])
                 m = int(i[6][13:15])
-                args = [data['user'], data['password'], a, i]
+                user = a.get_user()
+                password = a.get_password()
+                args = [user, password, a, i]
                 if not is_job(args):
-                    scheduler.add_job(job, 'date', run_date=datetime.datetime(n, y, r, h, m + 1, 0), args=args)
-                    out_log().out_txt(log_file, "预报名信息：活动名称：{} 报名时间：{}".format(i[2],
-                                                                               datetime.datetime(n, y, r, h, m + 1,
-                                                                                                 0)))  # 打印进行预报名的日志
+                    scheduler.add_job(job, 'date', run_date=datetime.datetime(n, y, r, h, m, 5), args=args)
+                    out_log().out_txt(log_file, "预报名信息：活动名称：{} 报名时间：{}".format(i[1],
+                                                                               datetime.datetime(n, y, r, h, m,
+                                                                                                 5)))  # 打印进行预报名的日志
             except Exception as e:
-                out_log().out_txt(err_file, "添加定时任务失败！\n{}".format(e))
+                out_log().out_txt(err_file, "添加定时任务失败！\n{}---{}".format(e, i))
+                t = datetime.datetime.now()
+                str_t = t.strftime('%Y-%m-%d%H:%M')
+                n = int(str_t[:4])
+                y = int(str_t[5:7])
+                r = int(str_t[8:10])
+                h = int(str_t[10:12])
+                m = int(str_t[13:15])
+                scheduler.add_job(job_add, 'date', run_date=datetime.datetime(n, y, r, h, m + 5, 0), args=[a])
 
 # 查找是否有这个任务
 def is_job(args):

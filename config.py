@@ -7,16 +7,16 @@ class config:
     log_file = "./log/log.log"
 
     #log文件最大大小
-    log_file_max_size = 1 * 1024 * 1024
+    log_file_max_size = 1 * 1024 * 512
 
     #错误信息路径
     err_file = "./log/err.log"
 
     #错误信息文件最大大小
-    err_file_max_size = 1 * 1024 * 1024
+    err_file_max_size = 1 * 1024 * 512
 
     #app版本号
-    d_version = '4.5.6'
+    d_version = '4.6.0'
 
     # 运行间隔 秒
     sleep_time = 2 * 60 * 60
