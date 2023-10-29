@@ -88,7 +88,7 @@ def main(data, name):
     a.set_config_user_name(name)  # 设置当前用户的自定用户名
 
     account_huodong = Request.get_activit(user_login['data'])  # 获取活动id 活动名称 活动状态
-
+    
     if account_huodong == None:
         return
 
@@ -164,7 +164,12 @@ def job_add(a):
                 r = int(str_t[8:10])
                 h = int(str_t[10:12])
                 m = int(str_t[13:15])
-                scheduler.add_job(job_add, 'date', run_date=datetime.datetime(n, y, r, h, m + 5, 0), args=[a])
+                if m  + 1 >= 60:
+                	h += 1
+                	m = 1
+                else :
+                	m += 1 
+                scheduler.add_job(job_add, 'date', run_date=datetime.datetime(n, y, r, h, m, 0), args=[a])
 
 # 查找是否有这个任务
 def is_job(args):
@@ -195,6 +200,7 @@ if __name__ == '__main__':
             a_data = json.loads(data[i])
             out_log().out_txt(log_file, "目前用户：{}：".format(i))
             main(a_data, i)
+            time.sleep(60 * 2)
         for i in account_list:
             out_log().out_txt(log_file, "{}   user:{}".format(datetime.datetime.now(), Account.get_user(i)))
 

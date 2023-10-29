@@ -57,10 +57,12 @@ class iostream:
             data = Request.get_huodong_xiangxi(passwd['data'], activityId)  # 获取活动详细信息
             # print(data)
             if data == None:
-                return list
+                continue
             # print(data['data']['joindate'])
             # out_log().out_txt(log_file, "活动详细信息：{}".format(data))
             data_t = None
+            if data['code'] != '100':
+            	continue
             try:
                 if data['data']['statusText'] == '规划中' or data['data']['statusText'] == '报名中':
                     data_t = data['data']
@@ -69,7 +71,7 @@ class iostream:
                 out_log().out_txt(err_file, "{}: 获取活动状态信息错误：{}\n {}".format(datetime.datetime.now(), data, e))
 
             if data_t == None:
-                return list
+                continue
             list_t = []
             activityName = data_t['activityName']  # 活动名称
             address = data_t['address']  # 活动地址
