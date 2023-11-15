@@ -38,50 +38,48 @@ class iostream:
                 f.write(json.dumps(datas))
 
     # 更新读取后 指定name中的数据
-    def updata_ini(user, password, token, account_huodong_msg, name):
-        data = iostream.get_account()
-        if data != None:
-            datas = json.loads(data[name])
-            datas['user'] = user
-            datas['password'] = password
-            datas['token'] = token
-            datas['account_huodong_msg'] = account_huodong_msg
-            data[name] = json.dumps(datas)
-            iostream.out_account_ini(data)
+    def updata_ini(self, uid, token, account_xinxi, name):
+        config.mysql.update_one("update `user` set uid=%s where `name`=%s", (uid, name))  # 更新token
+        config.mysql.update_one("update `user` set token=%s where `name`=%s", (token, name))  # 更新token
+        config.mysql.update_one("update `user` set account_msg=%s where `name`=%s",
+                                (account_xinxi, name))  # 更新account_huodong_msg
+
 
     # 获取account_huodong_msg
-    def huodong_ini(huodong, passwd):
+    def huodong_ini(huodong, passwd, phone):
         list = []
         for i in huodong:  # 活动id 活动名称 活动状态
             activityId = i['activityId']  # 活动id
             data = Request.get_huodong_xiangxi(passwd['data'], activityId)  # 获取活动详细信息
-            # print(data)
-            if data == None:
+            if int(data['code']) != 100:
                 continue
             # print(data['data']['joindate'])
             # out_log().out_txt(log_file, "活动详细信息：{}".format(data))
             data_t = None
-            if data['code'] != '100':
-            	continue
             try:
                 if data['data']['statusText'] == '规划中' or data['data']['statusText'] == '报名中':
                     data_t = data['data']
 
             except Exception as e:
-                out_log().out_txt(err_file, "{}: 获取活动状态信息错误：{}\n {}".format(datetime.datetime.now(), data, e))
+                out_log().out_txt(err_file,
+                                  "{}: 获取活动状态信息错误：{}\n {}{}".format(datetime.datetime.now(), data, e, data['code']))
 
             if data_t == None:
                 continue
-            list_t = []
-            activityName = data_t['activityName']  # 活动名称
-            address = data_t['address']  # 活动地址
-            unableJoinReason = data_t['countdownText']  # 活动状态 活动开始倒计时 活动结束倒计时 活动结束等
-            isbaoming = 0  # 是否报名过
+            dic = {}
+            dic['phone'] = phone
+            dic['huodong_id'] = activityId
+            dic['huodong_name'] = data_t['activityName']  # 活动名称
+            dic['huodong_position'] = data_t['address']  # 活动地址
+            dic['huodong_state'] = data_t['countdownText']  # startdate 活动持续时间
+            # 活动状态 活动开始倒计时 活动结束倒计时 活动结束等
+            dic['huodong_shifou_baoming'] = 0  # 是否报名过
 
             if data_t['statusText'] == '报名中':
-                list_t = [activityId, activityName, address, unableJoinReason, isbaoming, 0, 'null']
-
+                dic['huodong_shifou_kebaoming'] = 0
+                dic['huodong_time'] = 'null'
             if data_t['statusText'] == '规划中':
-                list_t = [activityId, activityName, address, unableJoinReason, isbaoming, 1, data_t['joindate'].replace(' ', '')]
-            list.append(list_t)
+                dic['huodong_shifou_kebaoming'] = 1
+                dic['huodong_time'] = data_t['joindate'].replace(' ', '')
+            list.append(dic)
         return list

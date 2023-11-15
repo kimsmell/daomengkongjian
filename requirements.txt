@@ -1,3 +1,5 @@
 pyDes
 requests
 apscheduler
+pymysql
+DBUtils
